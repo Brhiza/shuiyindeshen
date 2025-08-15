@@ -24,6 +24,8 @@ document.addEventListener('DOMContentLoaded', () => {
    const applyColorContainer = document.getElementById('apply-color-container');
    const applyColorCheckbox = document.getElementById('applyColorCheckbox');
     const timeWatermarkCheckbox = document.getElementById('timeWatermark');
+    const watermarkAngleInput = document.getElementById('watermarkAngle');
+    const angleValueDisplay = document.getElementById('angleValue');
 
      let originalImage = null;
      let selectedWatermarkPath = null;
@@ -39,6 +41,7 @@ document.addEventListener('DOMContentLoaded', () => {
    let shadowBlur = 10;
    let shadowOffsetX = 5;
    let shadowOffsetY = 5;
+   let watermarkAngle = -45; // 默认角度为-45度
     const watermarkCache = {}; // 用于缓存水印图片
 
     // 水印logo文件名列表
@@ -139,6 +142,8 @@ document.addEventListener('DOMContentLoaded', () => {
         shadowBlur = parseInt(shadowBlurInput.value, 10);
         shadowOffsetX = parseInt(shadowOffsetXInput.value, 10);
         shadowOffsetY = parseInt(shadowOffsetYInput.value, 10);
+        watermarkAngle = parseInt(watermarkAngleInput.value, 10);
+        angleValueDisplay.textContent = `${watermarkAngle}°`;
 
         if (originalImage && (customWatermarkText || selectedWatermarkPath)) {
             drawImageWithWatermark();
@@ -154,6 +159,7 @@ document.addEventListener('DOMContentLoaded', () => {
     shadowOffsetXInput.addEventListener('input', handleAdvancedControlsChange);
     shadowOffsetYInput.addEventListener('input', handleAdvancedControlsChange);
    applyColorCheckbox.addEventListener('change', handleAdvancedControlsChange);
+   watermarkAngleInput.addEventListener('input', handleAdvancedControlsChange);
  
      // --- 新增：自定义水印上传 ---
     customWatermarkUpload.addEventListener('click', () => {
@@ -385,6 +391,7 @@ document.addEventListener('DOMContentLoaded', () => {
             shadowBlur: isAdvanced ? shadowBlur : 10,
             shadowOffsetX: isAdvanced ? shadowOffsetX : 5,
             shadowOffsetY: isAdvanced ? shadowOffsetY : 5,
+            angle: isAdvanced ? watermarkAngle : -45,
         };
         // --- 结束：配置决定 ---
 
@@ -442,7 +449,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (isFullscreen) {
                 ctx.save();
                 ctx.translate(canvas.width / 2, canvas.height / 2);
-                ctx.rotate(-0.25 * Math.PI);
+                ctx.rotate(settings.angle * Math.PI / 180); // 将角度转换为弧度
 
                 const gap = watermarkWidth * settings.spacing;
 
@@ -486,7 +493,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 // 保存当前状态并旋转画布
                 ctx.save();
                 ctx.translate(canvas.width / 2, canvas.height / 2);
-                ctx.rotate(-0.25 * Math.PI); // 旋转约-45度
+                ctx.rotate(settings.angle * Math.PI / 180); // 使用可调整的角度
                 
                 const textWidth = ctx.measureText(customWatermarkText).width;
                 const gap = textWidth * settings.spacing; // 水印之间的间隙
