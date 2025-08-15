@@ -161,7 +161,8 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     watermarkLoader.addEventListener('change', (e) => {
-        if (e.target.files && e.target.files) {
+        const file = e.target.files && e.target.files[0];
+        if (file) {
             const reader = new FileReader();
             reader.onload = (event) => {
                 const img = new Image();
@@ -206,7 +207,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 };
                 img.src = event.target.result;
             };
-            reader.readAsDataURL(e.target.files);
+            reader.readAsDataURL(file);
         }
     });
     // --- 结束：自定义水印上传 ---
