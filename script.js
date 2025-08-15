@@ -355,8 +355,8 @@ document.addEventListener('DOMContentLoaded', () => {
         // 1. 绘制原图
         ctx.drawImage(originalImage, 0, 0);
 
-        // 如果没有选择水印或输入文字，则直接返回，不进行后续绘制
-        if (!selectedWatermarkPath && !customWatermarkText) {
+        // 如果没有选择水印或输入文字，且没有启用时间水印，则直接返回，不进行后续绘制
+        if (!selectedWatermarkPath && !customWatermarkText && !isTimeWatermark) {
             // 隐藏下载按钮
             downloadBtn.style.display = 'none';
             // --- 新增：显示结果图片 ---
@@ -552,8 +552,8 @@ document.addEventListener('DOMContentLoaded', () => {
         ctx.shadowOffsetX = 0;
         ctx.shadowOffsetY = 0;
 
-        // 只要有水印（图片或文字），就显示按钮
-        if (selectedWatermarkPath || customWatermarkText) {
+        // 只要有水印（图片或文字或时间水印），就显示按钮
+        if (selectedWatermarkPath || customWatermarkText || isTimeWatermark) {
             downloadBtn.style.display = 'block';
         } else {
             downloadBtn.style.display = 'none';
@@ -581,8 +581,8 @@ document.addEventListener('DOMContentLoaded', () => {
             alert('请先上传一张图片。');
             return;
         }
-        if (!selectedWatermarkPath && !customWatermarkText) {
-            alert('请选择或输入一个水印。');
+        if (!selectedWatermarkPath && !customWatermarkText && !isTimeWatermark) {
+            alert('请选择或输入一个水印，或启用时间水印。');
             return;
         }
 
