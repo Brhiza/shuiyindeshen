@@ -23,6 +23,7 @@
             <div id="watermark-options">
                 <!-- 水印选项将由JS动态生成 -->
                <div id="custom-watermark-upload" class="watermark-option upload-new" title="上传自定义水印">+</div>
+               <div id="no-watermark-option" class="watermark-option" title="不添加水印">/</div>
                <input type="file" id="watermarkLoader" accept="image/*" style="display: none;">
             </div>
             <div class="separator">或</div>
@@ -33,14 +34,22 @@
                        <input type="checkbox" id="fullscreenWatermark">
                        <label for="fullscreenWatermark">铺满全屏</label>
                    </div>
+                   <div class="time-watermark-option">
+                       <input type="checkbox" id="timeWatermark">
+                       <label for="timeWatermark">时间水印</label>
+                   </div>
                     <div class="advanced-option">
                         <input type="checkbox" id="advancedMode">
                         <label for="advancedMode">高级模式</label>
                     </div>
                 </div>
                 <div id="advanced-controls" style="display: none;">
-                    <div class="control-group">
+                    <div class="control-group color-controls">
                         <label for="watermarkColor">颜色:</label>
+                        <div id="apply-color-container" style="display: none;">
+                            <input type="checkbox" id="applyColorCheckbox">
+                            <label for="applyColorCheckbox">覆盖颜色</label>
+                        </div>
                         <input type="color" id="watermarkColor" value="#ffffff">
                     </div>
                     <div class="control-group">

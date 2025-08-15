@@ -10,6 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const fullscreenCheckbox = document.getElementById('fullscreenWatermark');
     const customWatermarkUpload = document.getElementById('custom-watermark-upload');
     const watermarkLoader = document.getElementById('watermarkLoader');
+    const noWatermarkOption = document.getElementById('no-watermark-option');
    const advancedModeCheckbox = document.getElementById('advancedMode');
    const advancedControls = document.getElementById('advanced-controls');
     const watermarkColorInput = document.getElementById('watermarkColor');
@@ -20,11 +21,16 @@ document.addEventListener('DOMContentLoaded', () => {
     const shadowBlurInput = document.getElementById('shadowBlur');
     const shadowOffsetXInput = document.getElementById('shadowOffsetX');
     const shadowOffsetYInput = document.getElementById('shadowOffsetY');
- 
+   const applyColorContainer = document.getElementById('apply-color-container');
+   const applyColorCheckbox = document.getElementById('applyColorCheckbox');
+    const timeWatermarkCheckbox = document.getElementById('timeWatermark');
+
      let originalImage = null;
      let selectedWatermarkPath = null;
+   let customLogo = null;
     let customWatermarkText = '';
     let isFullscreen = false;
+    let isTimeWatermark = false;
    let watermarkColor = '#ffffff';
    let watermarkOpacity = 1;
    let watermarkSize = 1;
@@ -111,10 +117,19 @@ document.addEventListener('DOMContentLoaded', () => {
        // 当勾选状态改变时，立即重绘
        if (originalImage && (customWatermarkText || selectedWatermarkPath)) {
            drawImageWithWatermark();
-       }
+        }
+        updateApplyColorVisibility();
    });
 
-    // --- 高级控制事件监听 ---
+ 
+    timeWatermarkCheckbox.addEventListener('change', (e) => {
+        isTimeWatermark = e.target.checked;
+        if (originalImage) {
+            drawImageWithWatermark();
+        }
+    });
+
+     // --- 高级控制事件监听 ---
     function handleAdvancedControlsChange() {
         watermarkColor = watermarkColorInput.value;
         watermarkOpacity = parseFloat(watermarkOpacityInput.value);
@@ -138,6 +153,7 @@ document.addEventListener('DOMContentLoaded', () => {
     shadowBlurInput.addEventListener('input', handleAdvancedControlsChange);
     shadowOffsetXInput.addEventListener('input', handleAdvancedControlsChange);
     shadowOffsetYInput.addEventListener('input', handleAdvancedControlsChange);
+   applyColorCheckbox.addEventListener('change', handleAdvancedControlsChange);
  
      // --- 新增：自定义水印上传 ---
     customWatermarkUpload.addEventListener('click', () => {
@@ -145,11 +161,12 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     watermarkLoader.addEventListener('change', (e) => {
-        if (e.target.files && e.target.files[0]) {
+        if (e.target.files && e.target.files) {
             const reader = new FileReader();
             reader.onload = (event) => {
                 const img = new Image();
                 img.onload = () => {
+                    customLogo = img;
                     const customWatermarkName = `custom_${Date.now()}`;
                     watermarkCache[customWatermarkName] = img;
 
@@ -172,7 +189,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
                     if (originalImage) {
                         drawImageWithWatermark();
-                    }
+                   }
+                   updateApplyColorVisibility();
 
                     // 为新选项添加点击事件
                     optionDiv.addEventListener('click', () => {
@@ -188,10 +206,27 @@ document.addEventListener('DOMContentLoaded', () => {
                 };
                 img.src = event.target.result;
             };
-            reader.readAsDataURL(e.target.files[0]);
+            reader.readAsDataURL(e.target.files);
         }
     });
     // --- 结束：自定义水印上传 ---
+
+    // --- 新增：无水印选项 ---
+    noWatermarkOption.addEventListener('click', () => {
+        // 移除所有选项的选中状态
+        document.querySelectorAll('.watermark-option').forEach(opt => opt.classList.remove('selected'));
+        // 为无水印选项添加选中状态
+        noWatermarkOption.classList.add('selected');
+
+        // 清空图片水印相关的变量
+        selectedWatermarkPath = null;
+
+        // 如果有原图，则重绘
+        if (originalImage) {
+            drawImageWithWatermark();
+        }
+    });
+    // --- 结束：无水印选项 ---
 
     // 图片上传处理
     // 点击上传区域
@@ -224,6 +259,9 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     function handleFile(file) {
+        if (!file) {
+            return;
+        }
         const reader = new FileReader();
         reader.onload = (event) => {
             originalImage = new Image();
@@ -273,6 +311,16 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+   function updateApplyColorVisibility() {
+       const isAdvanced = advancedModeCheckbox.checked;
+       const isCustomLogoUploaded = !!customLogo;
+       if (isAdvanced && isCustomLogoUploaded) {
+           applyColorContainer.style.display = 'flex';
+           applyColorCheckbox.checked = false; // 默认不勾选
+       } else {
+           applyColorContainer.style.display = 'none';
+       }
+   }
 
     function drawImageWithWatermark() {
         // 设置画布尺寸与原图一致
@@ -306,6 +354,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // 1. 绘制原图
         ctx.drawImage(originalImage, 0, 0);
+
+        // 如果没有选择水印或输入文字，则直接返回，不进行后续绘制
+        if (!selectedWatermarkPath && !customWatermarkText) {
+            // 隐藏下载按钮
+            downloadBtn.style.display = 'none';
+            // --- 新增：显示结果图片 ---
+            const imageUrl = canvas.toDataURL('image/jpeg', 0.7);
+            resultImage.src = imageUrl;
+            resultImage.style.display = 'block';
+            resultImage.style.width = canvas.style.width;
+            resultImage.style.height = canvas.style.height;
+            canvas.style.display = 'none'; // 隐藏canvas
+            return;
+        }
 
         // 2. 绘制水印
         const baseDimension = Math.min(originalImage.width, originalImage.height);
@@ -357,7 +419,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 return offscreenCanvas;
             }
 
-            const coloredWatermark = isAdvanced
+            const isCustomWatermark = selectedWatermarkPath.startsWith('custom_');
+           const applyColor = applyColorCheckbox.checked;
+           const coloredWatermark = isAdvanced && applyColor
                 ? createColoredWatermark(watermarkImage, settings.color)
                 : watermarkImage;
             // --- 结束：离屏Canvas逻辑 ---
@@ -450,6 +514,38 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
 
+
+        if (isTimeWatermark) {
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = now.getMonth() + 1;
+            const day = now.getDate();
+            const week = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
+            const dayOfWeek = week[now.getDay()];
+            const hours = now.getHours();
+            const minutes = now.getMinutes().toString().padStart(2, '0');
+            const timeText = `${year}.${month}.${day} ${dayOfWeek} ${hours}:${minutes}`;
+
+            const fontSize = baseDimension * 0.04 * settings.size; // 应用高级模式的大小
+            ctx.font = `bold ${fontSize}px Arial`;
+            
+            // 使用 hexToRgba 函数应用颜色和透明度
+            function hexToRgba(hex, alpha) {
+                const r = parseInt(hex.slice(1, 3), 16);
+                const g = parseInt(hex.slice(3, 5), 16);
+                const b = parseInt(hex.slice(5, 7), 16);
+                return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+            }
+            ctx.fillStyle = hexToRgba(settings.color, settings.opacity);
+
+            ctx.textAlign = 'left';
+            ctx.textBaseline = 'bottom'; // 改为底部对齐
+            
+            // 阴影已在前面统一设置，这里直接绘制即可
+            // Y坐标改为画布高度减去边距，以确保在左下角
+            ctx.fillText(timeText, margin, canvas.height - margin);
+        }
+
         // 重置阴影，以免影响其他绘图
         ctx.shadowColor = 'transparent';
         ctx.shadowBlur = 0;
@@ -505,10 +601,27 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+   function updateTime() {
+       const timeElement = document.getElementById('time-watermark');
+       if (timeElement) {
+           const now = new Date();
+           const year = now.getFullYear();
+           const month = now.getMonth() + 1;
+           const day = now.getDate();
+           const week = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
+           const dayOfWeek = week[now.getDay()];
+           const hours = now.getHours();
+           const minutes = now.getMinutes().toString().padStart(2, '0');
+           timeElement.textContent = `${year}.${month}.${day} ${dayOfWeek} ${hours}:${minutes}`;
+       }
+   }
+
+   updateTime();
+   setInterval(updateTime, 60000);
 });
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    navigator.service.register('/sw.js').then(registration => {
+    navigator.serviceWorker.register('/sw.js').then(registration => {
       console.log('SW registered: ', registration);
     }).catch(registrationError => {
       console.log('SW registration failed: ', registrationError);

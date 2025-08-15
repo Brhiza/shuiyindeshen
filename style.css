@@ -6,7 +6,7 @@ body {
     flex-direction: column;
     align-items: center;
     margin: 0;
-    padding: 20px;
+    padding:20px;
 }
 
 h1 {
@@ -144,6 +144,11 @@ button:hover {
     color: #007bff;
 }
 
+#no-watermark-option {
+    font-weight: bold;
+    color: #007bff;
+}
+
 .watermark-option.selected {
     border-color: #007bff;
 }
@@ -195,4 +200,27 @@ button:hover {
     padding: 2px;
     min-width: 0;
     height: 30px; /* 统一高度 */
+}
+
+.color-controls {
+    justify-content: space-between;
+}
+
+.color-controls label {
+    flex-grow: 0;
+}
+
+.color-controls #apply-color-container {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.color-controls #apply-color-container label {
+    flex-shrink: 0; /* 防止标签收缩 */
+    white-space: nowrap; /* 防止文字换行 */
+}
+#time-watermark {
+    margin-left: 15px;
+    vertical-align: middle;
 }
