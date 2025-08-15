@@ -1,0 +1,198 @@
+body {
+    font-family: sans-serif;
+    background-color: #f0f0f0;
+    color: #333;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 0;
+    padding: 20px;
+}
+
+h1 {
+    color: #0056b3;
+}
+
+.container {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    width: 100%;
+    max-width: 800px;
+}
+
+.upload-section, .watermark-section, .canvas-container, .download-section {
+    margin-bottom: 20px;
+}
+
+.download-section {
+    display: flex;
+    gap: 10px;
+}
+
+#watermark-selector {
+    padding: 8px;
+    font-size: 16px;
+    border-radius: 4px;
+    border: 1px solid #ddd;
+    min-width: 200px;
+}
+
+.canvas-container {
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 10px;
+    background-color: #fafafa;
+    max-height: 70vh; /* 最大高度为视口高度的70% */
+    display: none; /* 默认隐藏 */
+    justify-content: center; /* 水平居中 */
+    align-items: center; /* 垂直居中 */
+}
+
+#imageCanvas {
+    max-width: 100%;
+    display: block;
+}
+
+#resultImage {
+    max-width: 100%;
+    display: block;
+    margin: 0 auto; /* 居中显示 */
+}
+
+button {
+    padding: 10px 20px;
+    font-size: 16px;
+    color: #fff;
+    background-color: #007bff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+#drop-zone {
+    border: 2px dashed #ccc;
+    border-radius: 8px;
+    padding: 40px;
+    text-align: center;
+    cursor: pointer;
+    transition: background-color 0.3s, border-color 0.3s;
+}
+
+#drop-zone.dragover {
+    background-color: #f0f8ff;
+    border-color: #007bff;
+}
+
+.custom-watermark-section {
+    margin-top: 15px;
+}
+
+.fullscreen-option {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    cursor: pointer;
+}
+
+.fullscreen-option label {
+    cursor: pointer;
+}
+
+.separator {
+    text-align: center;
+    margin: 15px 0;
+    color: #888;
+}
+
+#customWatermark {
+    width: calc(100% - 20px); /* 减去内边距 */
+    padding: 10px;
+    font-size: 16px;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    transition: border-color 0.3s;
+}
+
+#customWatermark:focus {
+    outline: none;
+    border-color: #007bff;
+}
+#watermark-options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.watermark-option {
+    padding: 10px 15px;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: border-color 0.3s, background-color 0.3s;
+    background-color: #f9f9f9;
+    text-align: center;
+}
+
+.upload-new {
+    font-weight: bold;
+    color: #007bff;
+}
+
+.watermark-option.selected {
+    border-color: #007bff;
+}
+
+.option-controls {
+    display: flex;
+    gap: 20px; /* Add some space between the two options */
+    margin-top: 10px;
+}
+
+.advanced-option, .fullscreen-option {
+    margin-top: 0; /* Remove the top margin to align them */
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    cursor: pointer;
+}
+
+.advanced-option label {
+    cursor: pointer;
+}
+
+#advanced-controls {
+    margin-top: 15px;
+    padding: 15px;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+}
+
+.control-group {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+.control-group label {
+    flex-basis: 30%;
+}
+
+.control-group input {
+    flex-basis: 70%;
+}
+
+.control-group input[type="color"] {
+    flex-basis: 60px;
+    flex-grow: 0;
+    padding: 2px;
+    min-width: 0;
+    height: 30px; /* 统一高度 */
+}
